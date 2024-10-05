@@ -1,7 +1,7 @@
 import streamlit as st
 import matplotlib.pyplot as plt
-from eda import EDA
-from show_predict_page import show_predict_page
+from src.eda import EDA
+from src.show_predict_page import show_predict_page
 #from explore_page import Print, Plot, Univ_analysis
 import xgboost as xgb
 import pickle
