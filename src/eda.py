@@ -1,13 +1,11 @@
-import numpy as np # linear algebra
-import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-import scipy
 from sklearn.metrics import classification_report, accuracy_score
 from sklearn.ensemble import IsolationForest
 from sklearn.neighbors import LocalOutlierFactor
+import streamlit as st
 
 class EDA:
    
@@ -16,33 +14,65 @@ class EDA:
    
 
    def explore(self):
-      columns = self.df.columns
+      #columns = self.df.columns
       stats = self.df.describe()
-      return columns,stats
+      # st.write(f"### Columns Names")
+      # st.write(columns)
+      st.write(f"### Somes Statistiques about data")
+      st.write(stats)
+      #return columns,stats
    
    def data_visualisation(self):
-      self.df.hist(figsize = (20, 20))
-      plt.show()
+      st.write("### Histogram of All Features")
+      fig, ax = plt.subplots(figsize=(20, 20))
+      self.df.hist(ax=ax)
+      st.pyplot(fig)
 
    def correlation_matrix(self):
+      st.write(f"### Correlation Matrix")
+      
+      # Compute the correlation matrix
       corrmat = self.df.corr()
-      fig = plt.figure(figsize = (12, 9))
 
-      sns.heatmap(corrmat, vmax = 0.8, square = True)
-      plt.show()
+      # Check and handle NaN values in the correlation matrix
+      if corrmat.isnull().values.any():
+         st.write("Warning: The correlation matrix contains NaN values. They will be replaced with zeros.")
+         corrmat = corrmat.fillna(0)  # Replace NaN with 0 (or handle as necessary)
+      
+      # Create a figure for the heatmap
+      fig, ax = plt.subplots(figsize=(12, 9))  # Set figure size
+      
+      # Create the heatmap with seaborn, plotting onto 'ax'
+      sns.heatmap(corrmat, vmax=0.8, square=True, annot=True, cmap='coolwarm', ax=ax)
+      
+      # Render the plot in Streamlit
+      st.pyplot(fig)
 
    def show_percentages(self):
+      st.write(f"### Percentages Observation")
       
-      fraudulent_transactions = self.df[self.df['Class'] == 1]
-      valid_transactions = self.df[self.df['Class'] == 0]
+      # Filter for fraudulent and valid transactions
+      fraudulent_transactions = self.df[self.df['default payment next month'] == 1]
+      valid_transactions = self.df[self.df['default payment next month'] == 0]
+      
+      # Calculate the outlier fraction, adding a check to avoid division by zero
+      if len(valid_transactions) > 0:
+         outlier_fraction = float(len(fraudulent_transactions)) / float(len(valid_transactions))
+      else:
+         outlier_fraction = float('inf')  # Assign a special value (e.g., infinity) if no valid transactions exist
+      
+      # Display statistics
+      st.write(f"Fraudulent transactions: {len(fraudulent_transactions)}")
+      st.write(f"Valid transactions: {len(valid_transactions)}")
 
-      outlier_fraction = float(len(fraudulent_transactions)) / float(len(valid_transactions))
-      print(f"Fraudent transactions: {len(fraudulent_transactions)}")
-      print(f"Valid transactions: {len(valid_transactions)}")
-      print(f"Outlier fraction: {outlier_fraction}")
-      print(f"Outlier %: {round(outlier_fraction*100, 2)}")
+      # Handle special case where there are no valid transactions
+      if len(valid_transactions) > 0:
+         st.write(f"Outlier fraction: {outlier_fraction}")
+         st.write(f"Outlier %: {round(outlier_fraction * 100, 2)}")
+      else:
+         st.write("No valid transactions found, cannot compute outlier fraction or percentage.")
 
-      return fraudulent_transactions,valid_transactions,outlier_fraction#f"Fraudent transactions: {len(fraudulent_transactions)},Valid transactions: {len(valid_transactions)},Outlier fraction: {outlier_fraction},Outlier %: {round(outlier_fraction*100, 2)}"
+      #return fraudulent_transactions,valid_transactions,outlier_fraction#f"Fraudent transactions: {len(fraudulent_transactions)},Valid transactions: {len(valid_transactions)},Outlier fraction: {outlier_fraction},Outlier %: {round(outlier_fraction*100, 2)}"
    
    def Isolation_Forest_Algorithm(self):
       _,_,outlier_fraction = self.show_percentages()
@@ -82,8 +112,8 @@ class EDA:
       print(f"Total incorrect predictions: {n_errors}")
       print(classification_report(y, y_pred))  
 
-df = pd.read_csv("/Users/nguinabejosue/Desktop/Fraud_Detection/data/creditcard.csv")
-eda = EDA(df)
-# columns,stats=eda.explore()
-# print(f"Columns: {columns}")
-eda.data_visualisation()
+# df = pd.read_csv("data/default_of_credit_card_clients.csv",skiprows=1,index_col=0)
+# eda = EDA(df)
+# # columns,stats=eda.explore()
+# # print(f"Columns: {columns}")
+# eda.data_visualisation()
