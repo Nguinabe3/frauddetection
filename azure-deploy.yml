@@ -1,0 +1,48 @@
+name: Build and Deploy to Azure
+
+# Define the event trigger
+on:
+  push:
+    branches:
+      - main
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the code from the repository
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # Step 2: Log in to Azure using credentials stored in GitHub Secrets
+      - name: Log in to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      # Step 3: Log in to Azure Container Registry (ACR)
+      - name: Log in to Azure Container Registry
+        run: |
+          az acr login --name rehamcontainerregistry
+
+      # Step 4: Build Docker image
+      - name: Build Docker Image
+        run: |
+          docker build -t rehamcontainerregistry.azurecr.io/my-streamlit-app:v1 .
+
+      # Step 5: Push Docker image to ACR
+      - name: Push Docker Image
+        run: |
+          docker push rehamcontainerregistry.azurecr.io/my-streamlit-app:v1
+
+      # Step 6: Deploy the container to Azure Web App
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: 'my-streamlit-app'  # Replace with your Azure Web App name
+          images: 'rehamcontainerregistry.azurecr.io/my-streamlit-app:v1'
+
+      # Step 7: Configure port for the Web App
+      - name: Set Web App Port
+        run: |
+          az webapp config appsettings set --resource-group default_prediction --name my-streamlit-app --settings WEBSITES_PORT=8501
