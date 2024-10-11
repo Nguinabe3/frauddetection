@@ -7,25 +7,30 @@ import logging
 import io
 from datetime import datetime, timedelta, timezone
 from typing import Union
-from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from passlib.context import CryptContext
 import jwt
 from jwt import PyJWTError
 import joblib
+import os
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 
-# Load the  default prediction model
+# Load the default prediction model
+model_path = "xgb_model.pkl"  # Update with your actual model file path
+if not os.path.exists(model_path):
+    logging.error(f"Model file not found: {model_path}")
+    raise RuntimeError(f"Model file not found: {model_path}")
+
 try:
-    model = joblib.load("xgb_model.pkl")  # Update with your actual model file path
-    logging.info(" default prediction model loaded successfully.")
+    model = joblib.load(model_path)
+    logging.info("Default prediction model loaded successfully.")
 except Exception as e:
-    logging.error(f"Error loading  default prediction model: {e}")
+    logging.error(f"Error loading default prediction model: {e}")
+    raise RuntimeError(f"Error loading model: {e}")
 
 # JWT settings
-SECRET_KEY = "1b09eae62fffc38eac635a40e90f68652ef34161ade629343429538b53a67344"  # Replace with your own secret key
+SECRET_KEY = "1b09eae62fffc38eac635a40e90f68652ef34161ade629343429538b53a67344"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
@@ -92,10 +97,15 @@ async def predict_fraud_csv(file: UploadFile = File(...), token: str = Depends(o
                             'BILL_AMT1', 'BILL_AMT2', 'BILL_AMT3', 'BILL_AMT4', 'BILL_AMT5', 'BILL_AMT6',
                             'PAY_AMT1', 'PAY_AMT2', 'PAY_AMT3', 'PAY_AMT4', 'PAY_AMT5', 'PAY_AMT6']
         
+        # Check if the columns match
         if not all(column in df.columns for column in expected_columns):
             raise HTTPException(status_code=400, detail="CSV must contain the required columns.")
 
-        # Apply the  default prediction model on the DataFrame
+        # If necessary, apply the same preprocessing steps used during model training
+        # Example: scaling, encoding
+        # df[expected_columns] = scaler.transform(df[expected_columns])  # Example preprocessing (uncomment if needed)
+
+        # Apply the default prediction model on the DataFrame
         predictions = model.predict(df[expected_columns])
 
         # Attach predictions to DataFrame and return as response
@@ -110,5 +120,4 @@ async def predict_fraud_csv(file: UploadFile = File(...), token: str = Depends(o
 
 @app.get("/")
 def root():
-    return {"message": " default prediction API is running"}
-
+    return {"message": "Default prediction API is running"}

@@ -26,12 +26,17 @@ if not st.session_state['authenticated']:
     st.title("Login")
     username = st.text_input("Username")
     password = st.text_input("Password", type="password")
+    
+    # Check if the user presses the "Login" button
     if st.button("Login"):
         if authenticate(username, password):
+            # Update session state upon successful login
             st.session_state['authenticated'] = True
             st.success(f"Welcome, {username}!")
+            # Streamlit will automatically re-render after the button is pressed, so no need for experimental_rerun
         else:
             st.error("Invalid username or password")
+
 else:
     # Main app content after successful login
     st.title("Welcome to Default Payment Credit Card System")
@@ -72,5 +77,5 @@ else:
             st.write("Please upload a CSV file to explore the data.")
 
     elif action == 'Predict Default Credit Card Payment':
-        # For demonstration purposes, we'll just display a message
+        # Call the prediction page function
         show_predict_page()
