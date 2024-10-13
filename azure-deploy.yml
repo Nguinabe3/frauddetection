@@ -1,10 +1,10 @@
 name: Build and Deploy to Azure
 
-# Define the event trigger
 on:
   push:
     branches:
-      - main
+      - main  # Ensure this is the branch you're working on
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -42,7 +42,7 @@ jobs:
           app-name: 'my-streamlit-app'  # Replace with your Azure Web App name
           images: 'rehamcontainerregistry.azurecr.io/my-streamlit-app:v1'
 
-      # Step 7: Configure port for the Web App
+      # Step 7: Configure the Web App port
       - name: Set Web App Port
         run: |
           az webapp config appsettings set --resource-group default_prediction --name my-streamlit-app --settings WEBSITES_PORT=8501

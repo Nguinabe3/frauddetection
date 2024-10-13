@@ -17,7 +17,7 @@ import os
 logging.basicConfig(level=logging.INFO)
 
 # Load the default prediction model
-model_path = "xgb_model.pkl"  # Update with your actual model file path
+model_path = "xgb_classifier_model.pkl"  # Update to the correct model file name if needed
 if not os.path.exists(model_path):
     logging.error(f"Model file not found: {model_path}")
     raise RuntimeError(f"Model file not found: {model_path}")
@@ -92,18 +92,13 @@ async def predict_fraud_csv(file: UploadFile = File(...), token: str = Depends(o
         contents = await file.read()
         df = pd.read_csv(io.StringIO(contents.decode('utf-8')))  # Read the CSV
 
-        # Ensure the CSV has the expected columns (adjust column names as per your dataset)
+        # Ensure the CSV has the expected columns
         expected_columns = ['LIMIT_BAL', 'AGE', 'PAY_0', 'PAY_2', 'PAY_3', 'PAY_4', 'PAY_5', 'PAY_6',
                             'BILL_AMT1', 'BILL_AMT2', 'BILL_AMT3', 'BILL_AMT4', 'BILL_AMT5', 'BILL_AMT6',
                             'PAY_AMT1', 'PAY_AMT2', 'PAY_AMT3', 'PAY_AMT4', 'PAY_AMT5', 'PAY_AMT6']
         
-        # Check if the columns match
         if not all(column in df.columns for column in expected_columns):
             raise HTTPException(status_code=400, detail="CSV must contain the required columns.")
-
-        # If necessary, apply the same preprocessing steps used during model training
-        # Example: scaling, encoding
-        # df[expected_columns] = scaler.transform(df[expected_columns])  # Example preprocessing (uncomment if needed)
 
         # Apply the default prediction model on the DataFrame
         predictions = model.predict(df[expected_columns])
@@ -117,6 +112,46 @@ async def predict_fraud_csv(file: UploadFile = File(...), token: str = Depends(o
     except Exception as e:
         logging.error(f"Error processing the CSV file: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error while processing the file")
+
+
+# Data model for individual inputs
+class FraudPredictionInput(BaseModel):
+    LIMIT_BAL: float
+    AGE: int
+    PAY_0: int
+    PAY_2: int
+    PAY_3: int
+    PAY_4: int
+    PAY_5: int
+    PAY_6: int
+    BILL_AMT1: float
+    BILL_AMT2: float
+    BILL_AMT3: float
+    BILL_AMT4: float
+    BILL_AMT5: float
+    BILL_AMT6: float
+    PAY_AMT1: float
+    PAY_AMT2: float
+    PAY_AMT3: float
+    PAY_AMT4: float
+    PAY_AMT5: float
+    PAY_AMT6: float
+
+# Fraud prediction endpoint using individual inputs
+@app.post("/predict-fraud/")
+async def predict_fraud(data: FraudPredictionInput, token: str = Depends(oauth2_scheme)):
+    # Convert input data to a DataFrame
+    df = pd.DataFrame([data.dict()])
+
+    try:
+        # Apply the default prediction model
+        prediction = model.predict(df)[0]
+        return {"prediction": int(prediction)}
+
+    except Exception as e:
+        logging.error(f"Error processing the input data: {e}")
+        raise HTTPException(status_code=500, detail="Internal Server Error while processing the input data")
+
 
 @app.get("/")
 def root():
