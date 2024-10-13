@@ -7,3 +7,6 @@ seaborn
 scikit-learn
 joblib
 fastapi[standard]
+streamlit
+passlib
+requests
