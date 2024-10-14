@@ -40,5 +40,5 @@ jobs:
       # Deploy the Docker image from ACR to Azure Web App
       - name: Deploy to Azure Web App
         run: |
-          az webapp config container set --name myUniqueWebApp123 --resource-group predictfraudp --docker-custom-image-name myfrauddetection.azurecr.io/dockerimage:latest
-          az webapp restart --name myUniqueWebApp123 --resource-group predictfraudp
+          az webapp config container set --name myuniquewebapp123 --resource-group predictfraudp --docker-custom-image-name myfrauddetection.azurecr.io/dockerimage:latest
+          az webapp restart --name myuniquewebapp123 --resource-group predictfraudp
