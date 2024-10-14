@@ -47,21 +47,91 @@ To run the project locally, ensure you have Python 3.7 or higher installed. Foll
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/your-repo/default-payment-prediction.git
-   cd default-payment-prediction
+   git clone https://github.com/Nguinabe3/frauddetection.git
+   cd frauddetection
 '''
 ## Install the required dependencies:
 
 ```bash
 pip install -r requirements.txt
-'''
+```
+
 ## Run the FastAPI app:
 
 ```bash
 uvicorn main:app --reload
-'''
+```
 ## Run the FastAPI app:
 
 ```bash
 uvicorn main:app --reload
-'''
+```
+
+## Usage
+
+- **Azure API**: The model is deployed on Azure, and you can interact with it through the Streamlit interface.
+
+   To access the Streamlit app, visit the following URL:
+
+   [http://myuniquewebapp123.azurewebsites.net](http://myuniquewebapp123.azurewebsites.net)
+
+   After opening the app, you can input the required client details, and the model will return a prediction on the likelihood of the client defaulting. The Streamlit interface provides a user-friendly way to interact with the model without needing to send manual API requests.
+## Dependencies
+
+This project uses the following Python libraries:
+
+- Streamlit
+- FastAPI
+- Scikit-learn
+- XGBoost
+- Matplotlib
+- Pandas
+- NumPy
+- Seaborn
+- Passlib
+- PyJWT
+
+For the full list of dependencies, refer to the [requirements.txt](requirements.txt) file.
+
+## Dataset
+
+The dataset used in this project is named `default_of_credit_card_clients.csv`. It contains data on credit card clients from a financial institution, including demographic information, credit history, payment records, and the default status of each client. This dataset is used to train the machine learning model to predict whether a client is likely to default on their credit card payment.
+
+### Key Details:
+- The dataset contains **30,000 records** used to train the model.
+- It consists of **23 columns**, representing various features about the client and their credit behavior.
+
+### Key Features:
+
+- **ID**: A unique identifier for each client.
+- **Limit_Bal**: The credit limit of the client.
+- **Sex**: Gender of the client (1 = male, 2 = female).
+- **Education**: Education level of the client (1 = graduate school, 2 = university, 3 = high school, 4 = others).
+- **Marriage**: Marital status of the client (1 = married, 2 = single, 3 = others).
+- **Age**: The age of the client.
+- **Pay_0 to Pay_6**: History of past payments for the last 6 months. It reflects the payment status (-1 = pay duly, 1 = payment delay for one month, 2 = payment delay for two months, etc.).
+- **Bill_Amt1 to Bill_Amt6**: The amount of bill statement for the last six months.
+- **Pay_Amt1 to Pay_Amt6**: The amount paid in the last six months.
+- **Default Payment Next Month**: The target variable (1 = client will default, 0 = client will not default).
+
+The dataset contains comprehensive information on each client's credit behavior, allowing the model to learn patterns related to default risk based on client history and demographics.
+## Deployment on Azure
+
+The model has been deployed on **Microsoft Azure**, providing a scalable and reliable infrastructure to serve predictions in real-time. Azure's platform ensures that the application can handle multiple user requests efficiently and can scale according to demand. The Streamlit app is accessible via a publicly available URL, allowing users to input client data and receive predictions on whether a client is likely to default on their credit card payment.
+
+To access the deployed application, visit the following URL:
+
+[http://myuniquewebapp123.azurewebsites.net](http://myuniquewebapp123.azurewebsites.net)
+
+### Benefits of Azure Deployment:
+- **Scalability**: Automatically scales with the number of requests, ensuring high availability.
+- **Reliability**: Azure offers a robust platform with built-in monitoring and security features.
+- **Accessibility**: The application is available to users globally through a web interface, eliminating the need for local installations.
+
+## CI/CD Pipeline
+
+A **CI/CD pipeline** has been implemented using **GitHub Actions** to streamline the process of testing and deploying code changes to Azure. The workflow file `main_myuniquewebapp123.yml` defines the automation steps for continuous integration (CI) and continuous deployment (CD). 
+
+### How the CI/CD Pipeline Works:
+1. **Continuous Integration**: Each time code is pushed to the repository, the pipeline runs automated tests to ensure that the codebase is functioning as expected. This ensures that no broken code is deployed.
+2. **Continuous Deployment**: Once the code passes the tests, it is automatically deployed to Azure. This allows for faster iterations and ensures that the latest features and bug fixes are quickly made available in the production environment.
