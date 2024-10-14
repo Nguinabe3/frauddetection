@@ -1,0 +1,39 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Log in to Azure Container Registry
+        uses: azure/docker-login@v1
+        with:
+          login-server: myfrauddetection.azurecr.io
+          username: ${{ secrets.AZURE_ACR_USERNAME }}
+          password: ${{ secrets.AZURE_ACR_PASSWORD }}
+
+      - name: Build and push Docker image
+        run: |
+          docker build -t myfrauddetection.azurecr.io/dockerimage:latest .
+          docker push myfrauddetection.azurecr.io/dockerimage:latest
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Azure WebApp Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Deploy to Azure Web App
+        run: |
+          az webapp config container set --name myuniquewebapp123 --resource-group predictfraudp --docker-custom-image-name myfrauddetection.azurecr.io/dockerimage:latest
+          az webapp restart --name myuniquewebapp123 --resource-group predictfraudp
