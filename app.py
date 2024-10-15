@@ -5,24 +5,6 @@ import joblib
 from evidently.report import Report
 from evidently.metric_preset import DataDriftPreset
 import streamlit.components.v1 as components
-from azure.storage.blob import BlobServiceClient
-from io import StringIO
-import os
-
-# Azure Blob Storage settings
-AZURE_STORAGE_CONNECTION_STRING = st.secrets["AZURE_STORAGE_CONNECTION_STRING"]  # Streamlit secrets for Azure connection string
-BLOB_CONTAINER_NAME = "mycontainer"  # Replace with your actual container name
-BLOB_NAME = "myfolder/files/md5/07/default_of_credit_card_clients.csv"  # Path of your file in Azure Blob Storage
-
-# Helper function to load data from Azure Blob Storage
-def load_data_from_blob():
-    blob_service_client = BlobServiceClient.from_connection_string(AZURE_STORAGE_CONNECTION_STRING)
-    blob_client = blob_service_client.get_blob_client(container=BLOB_CONTAINER_NAME, blob=BLOB_NAME)
-    download_stream = blob_client.download_blob().readall()
-
-    # Use StringIO to read the CSV file
-    df = pd.read_csv(StringIO(download_stream.decode('utf-8')), skiprows=1, index_col=0)
-    return df
 
 # FastAPI backend URL (update this if it's hosted elsewhere)
 FASTAPI_URL = "http://127.0.0.1:8000"
@@ -141,8 +123,8 @@ if st.session_state.jwt_token:
     st.write("---")
     st.write("### Data Drift Detection")
 
-    # Load the dataset from Azure Blob Storage
-    df = load_data_from_blob()
+    # Load the dataset and the model
+    df = pd.read_csv('default_of_credit_card_clients.csv', skiprows=1, index_col=0)
     df.drop(columns=['default payment next month'], inplace=True)
 
     # Load the pre-trained model
@@ -161,8 +143,8 @@ if st.session_state.jwt_token:
 
     # Create data samples for reference and testing
     data = df[col_impp]
-    sample_ref = data.iloc[:100]  # Reference data
-    sample_test = data.iloc[100:200]  # Test data (could be new or current data)
+    sample_ref = data.iloc[100:200]  # Reference data
+    sample_test = data.iloc[800:900]  # Test data (could be new or current data)
 
     # Initialize the drift report
     report = Report(metrics=[DataDriftPreset()])
@@ -171,7 +153,7 @@ if st.session_state.jwt_token:
     report.run(reference_data=sample_ref, current_data=sample_test)
 
     # Save the report as an HTML file
-    report_file = "/tmp/drift_report.html"  # Ensure the file is saved in an accessible location
+    report_file = "drift_report.html"
     report.save_html(report_file)
 
     # Read and display the HTML report in Streamlit
