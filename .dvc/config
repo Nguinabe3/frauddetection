@@ -1,0 +1,6 @@
+[core]
+remote = azure-remote
+
+[remote "azure-remote"]
+url = azure://mycontainer/myfolder
+connection_string = ${AZURE_STORAGE_CONNECTION_STRING}  # Use environment variable

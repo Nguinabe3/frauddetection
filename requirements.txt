@@ -12,3 +12,5 @@ passlib
 requests
 pyjwt
 evidently
+dvc[azure]
+
