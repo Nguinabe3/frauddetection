@@ -59,12 +59,12 @@ pip install -r requirements.txt
 ## Run the FastAPI app:
 
 ```bash
-uvicorn main:app --reload
+uvicorn app:app --reload
 ```
-## Run the FastAPI app:
+## Run the Run the Streamlit app:
 
 ```bash
-uvicorn main:app --reload
+streamlit run app.py
 ```
 
 ## Usage

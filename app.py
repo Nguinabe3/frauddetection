@@ -1,6 +1,10 @@
 import streamlit as st
 import requests
-import json
+import pandas as pd
+import joblib
+from evidently.report import Report
+from evidently.metric_preset import DataDriftPreset
+import streamlit.components.v1 as components
 
 # FastAPI backend URL (update this if it's hosted elsewhere)
 FASTAPI_URL = "http://127.0.0.1:8000"
@@ -115,3 +119,47 @@ if st.session_state.jwt_token:
         except Exception as e:
             st.error(f"An error occurred: {e}")
 
+    # Adding data drift detection
+    st.write("---")
+    st.write("### Data Drift Detection")
+
+    # Load the dataset and the model
+    df = pd.read_csv('default_of_credit_card_clients.csv', skiprows=1, index_col=0)
+    df.drop(columns=['default payment next month'], inplace=True)
+
+    # Load the pre-trained model
+    loaded_model = joblib.load('xgb_classifier_model.pkl')
+
+    # Get feature importances from the model
+    importances = loaded_model.feature_importances_
+
+    # Create a DataFrame to map feature names to their importance values
+    feature_importance_df = pd.DataFrame({'Feature': df.columns, 'Importance': importances})
+
+    # Sort the DataFrame by importance values and select the top features
+    feature_importance_df = feature_importance_df.sort_values(by='Importance', ascending=False)
+    df_import = feature_importance_df[feature_importance_df['Importance'] >= 0.02].Feature
+    col_impp = list(df_import)
+
+    # Create data samples for reference and testing
+    data = df[col_impp]
+    sample_ref = data.iloc[100:200]  # Reference data
+    sample_test = data.iloc[800:900]  # Test data (could be new or current data)
+
+    # Initialize the drift report
+    report = Report(metrics=[DataDriftPreset()])
+
+    # Run the drift detection on the samples
+    report.run(reference_data=sample_ref, current_data=sample_test)
+
+    # Save the report as an HTML file
+    report_file = "drift_report.html"
+    report.save_html(report_file)
+
+    # Read and display the HTML report in Streamlit
+    with open(report_file, "r") as f:
+        report_html = f.read()
+
+    # Render the HTML in Streamlit
+    st.write("### Data Drift Report")
+    components.html(report_html, height=1000)  # Display the report in Streamlit
