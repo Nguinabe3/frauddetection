@@ -10,7 +10,7 @@ from io import StringIO
 import os
 
 # Azure Blob Storage settings
-AZURE_STORAGE_CONNECTION_STRING = os.getenv("AZURE_STORAGE_CONNECTION_STRING")  # Add your Azure connection string to Streamlit secrets
+AZURE_STORAGE_CONNECTION_STRING = st.secrets["AZURE_STORAGE_CONNECTION_STRING"]  # Streamlit secrets for Azure connection string
 BLOB_CONTAINER_NAME = "mycontainer"  # Replace with your actual container name
 BLOB_NAME = "myfolder/files/md5/07/default_of_credit_card_clients.csv"  # Path of your file in Azure Blob Storage
 
@@ -161,8 +161,8 @@ if st.session_state.jwt_token:
 
     # Create data samples for reference and testing
     data = df[col_impp]
-    sample_ref = data.iloc[100:200]  # Reference data
-    sample_test = data.iloc[800:900]  # Test data (could be new or current data)
+    sample_ref = data.iloc[:100]  # Reference data
+    sample_test = data.iloc[100:200]  # Test data (could be new or current data)
 
     # Initialize the drift report
     report = Report(metrics=[DataDriftPreset()])
@@ -171,7 +171,7 @@ if st.session_state.jwt_token:
     report.run(reference_data=sample_ref, current_data=sample_test)
 
     # Save the report as an HTML file
-    report_file = "drift_report.html"
+    report_file = "/tmp/drift_report.html"  # Ensure the file is saved in an accessible location
     report.save_html(report_file)
 
     # Read and display the HTML report in Streamlit
@@ -181,4 +181,3 @@ if st.session_state.jwt_token:
     # Render the HTML in Streamlit
     st.write("### Data Drift Report")
     components.html(report_html, height=1000)  # Display the report in Streamlit
-############
