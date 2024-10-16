@@ -57,16 +57,19 @@ To run the project locally, ensure you have Python 3.7 or higher installed. Foll
 pip install -r requirements.txt
 ```
 
+
 ## Run the FastAPI app:
 
 ```bash
-uvicorn app:app --reload
+uvicorn main:app --reload
 ```
-## Run the Run the Streamlit app:
+Local URL: [http://127.0.0.1:8000](http://127.0.0.1:8000)
+## Run the Streamlit app:
 
 ```bash
 streamlit run app.py
 ```
+Local URL: [http://localhost:8501](http://localhost:8501)
 
 ## Usage
 
@@ -138,7 +141,11 @@ A **CI/CD pipeline** has been implemented using **GitHub Actions** to streamline
 2. **Continuous Deployment**: Once the code passes the tests, it is automatically deployed to Azure. This allows for faster iterations and ensures that the latest features and bug fixes are quickly made available in the production environment.
 
 
-### Data Drift Detection
+## Data Drift Detection
 
 We implemented data drift detection using the Evidently library to monitor shifts in data over time. Historical data is loaded from Azure, and the most important features are selected based on a pre-trained model. A reference dataset (past behavior) and a test dataset (current data) are compared, generating an HTML report to highlight any distribution changes. This helps us detect performance issues early and take corrective actions like retraining the model.
+## Run the app_with_dvc:
+
+```bash
+run app_with_dvc.py```
 
