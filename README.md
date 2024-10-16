@@ -15,8 +15,8 @@ Key components include:
 ## Project Structure
 
 ```bash
-.
 ├── app.py                             # FastAPI application for serving the default payment prediction model
+├── app_with_dvc.py                    # Script for integrating DVC and data drift detection
 ├── credit-card-fraud-detection.ipynb  # Jupyter Notebook for data analysis, feature engineering, and model training
 ├── default_of_credit_card_clients.csv # Dataset containing credit card client payment history
 ├── main.py                            # The main script for running the FastAPI app
@@ -30,7 +30,8 @@ Key components include:
 ├── .github/                           # GitHub workflows folder
 │   └── workflows/                     # CI/CD workflows
 │       └── main_myuniquewebapp123.yml # GitHub Actions workflow configuration for CI/CD
-└── README.md                          # Project documentation
+├── README.md                          # Project documentation
+
 ```
 ## Features
 
@@ -135,3 +136,9 @@ A **CI/CD pipeline** has been implemented using **GitHub Actions** to streamline
 ### How the CI/CD Pipeline Works:
 1. **Continuous Integration**: Each time code is pushed to the repository, the pipeline runs automated tests to ensure that the codebase is functioning as expected. This ensures that no broken code is deployed.
 2. **Continuous Deployment**: Once the code passes the tests, it is automatically deployed to Azure. This allows for faster iterations and ensures that the latest features and bug fixes are quickly made available in the production environment.
+
+
+### Data Drift Detection
+
+We implemented data drift detection using the Evidently library to monitor shifts in data over time. Historical data is loaded from Azure, and the most important features are selected based on a pre-trained model. A reference dataset (past behavior) and a test dataset (current data) are compared, generating an HTML report to highlight any distribution changes. This helps us detect performance issues early and take corrective actions like retraining the model.
+
