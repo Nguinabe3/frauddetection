@@ -16,7 +16,7 @@ Key components include:
 
 ```bash
 ├── app.py                             # FastAPI application for serving the default payment prediction model
-├── app_with_dvc.py                    # Script for integrating DVC and data drift detection
+├── app_with_dvc.py                    # Script for integrating DVC and data drift detection (including saving the drift report)
 ├── credit-card-fraud-detection.ipynb  # Jupyter Notebook for data analysis, feature engineering, and model training
 ├── default_of_credit_card_clients.csv # Dataset containing credit card client payment history
 ├── main.py                            # The main script for running the FastAPI app
@@ -31,6 +31,7 @@ Key components include:
 │   └── workflows/                     # CI/CD workflows
 │       └── main_myuniquewebapp123.yml # GitHub Actions workflow configuration for CI/CD
 ├── README.md                          # Project documentation
+└── drift_report.html                  # HTML report for data drift detection
 
 ```
 ## Features
