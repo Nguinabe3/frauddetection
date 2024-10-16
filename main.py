@@ -123,7 +123,7 @@ async def predict_fraud(data: FraudPredictionInput, token: str = Depends(oauth2_
 
         # Return a meaningful result based on the prediction
         if prediction[0] == 0:
-            return {"prediction": "TThe user will not default on their payment next month."}
+            return {"prediction": "The user will not default on their payment next month."}
         else:
             return {"prediction": "The user will default on their payment next month."}
 
