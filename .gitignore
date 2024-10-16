@@ -1,5 +1,3 @@
-data/*
 *.DS_Store
 *.json
 src/*__pycache__
-/default_of_credit_card_clients.csv
