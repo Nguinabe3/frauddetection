@@ -124,7 +124,7 @@ if st.session_state.jwt_token:
     st.write("### Data Drift Detection")
 
     # Load the dataset and the model
-    df = pd.read_csv('default_of_credit_card_clients.csv.dvc', skiprows=1, index_col=0)
+    df = pd.read_csv('defaultofcreditcardclients.csv', skiprows=1, index_col=0)
     df.drop(columns=['default payment next month'], inplace=True)
 
     # Load the pre-trained model
